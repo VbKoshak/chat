@@ -1,0 +1,29 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "socket.io test",
+  "main": "index.js",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "babel-eslint": "^10.0.3",
+    "express": "^4.17.1",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.3.0",
+    "eslint-plugin-react": "^7.14.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VbKoshak/chat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VbKoshak/chat/issues"
+  },
+  "homepage": "https://github.com/VbKoshak/chat#readme"
+}
