@@ -9,6 +9,8 @@ let server = require('http').createServer(app);
 let io = require('socket.io').listen(server);
 server.listen(3000);
 
+let messageStorage = [];
+
 let usersCount = 0;
 
 app.get('/',function(req, res) {
@@ -18,13 +20,15 @@ app.use(express.static('public'));
 
 
 io.on('connection', (socket) => {
-    console.log('connected');
     socket.id = ++usersCount;
+    console.log('user#' + socket.id + ' connected');
+    io.emit('chat history',messageStorage);
     socket.on('disconnect', function () {
-        console.log('user disconnected');
+        console.log('user#' + socket.id + ' disconnected');
     });
     socket.on('chat message',(msg) => {
         console.log( "" + socket.id + " : " + msg);
+        messageStorage.push(msg);
         io.emit('chat message', msg);
     });
 });

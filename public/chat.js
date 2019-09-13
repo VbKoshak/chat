@@ -10,9 +10,20 @@ document.querySelector('#button').onclick = () => {
     socket.emit('chat message', document.querySelector('#message').value);
 };
 
-socket.on('chat message', (msg) => {
+let ml = document.querySelector('#messages');
+
+let createMsg = (msg) => {
     let li = document.createElement('li');
-    let ml = document.querySelector('#messages');
     li.innerText = msg;
-    ml.appendChild(li);
+    return li;
+};
+
+socket.on('chat message', (msg) => {
+    ml.appendChild(createMsg(msg));
+});
+
+socket.on('chat history', (msgs) => {
+    for(let msg in msgs){
+        ml.appendChild(createMsg(msgs[msg]));
+    }
 });
