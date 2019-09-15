@@ -3,6 +3,8 @@
 //io - server
 //socket - user
 
+const help = require('./secondary.js');
+
 let express = require('express');
 let app = express();
 let server = require('http').createServer(app);
@@ -13,24 +15,32 @@ let messageStorage = [];
 
 let usersCount = 0;
 
-app.get('/',function(req, res) {
+
+
+app.get('/', function (req, res) {
     res.sendFile(__dirname + '/public/index.html');
 });
 app.use(express.static('public'));
 
 
 io.on('connection', (socket) => {
-    socket.id = ++usersCount;
-    console.log('user#' + socket.id + ' connected');
-    io.emit('chat history',messageStorage);
+
+    socket.user = {};
+    socket.user.id = ++usersCount;
+    socket.user.username = 'guest';
+    socket.user.color = help.generateColor();
+    socket.user.user = {};
+
+    console.log('user#' + socket.user.id + ' connected');
+    socket.emit('chat history', messageStorage);
+
     socket.on('disconnect', function () {
-        console.log('user#' + socket.id + ' disconnected');
+        console.log('user#' + socket.user.id + ' disconnected');
     });
-    socket.on('chat message',(msg) => {
-        console.log( "" + socket.id + " : " + msg);
-        messageStorage.push(msg);
-        io.emit('chat message', msg);
+
+    socket.on('chat message', (msg) => {
+        console.log("" + socket.user.id + " : " + msg);
+        messageStorage.push([socket.user,msg]);
+        io.emit('chat message', socket.user, msg);
     });
 });
-
-
