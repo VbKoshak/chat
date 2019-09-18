@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 const help = require('./secondary.js');
 
 let express = require('express');
@@ -12,18 +12,26 @@ const assert = require('assert');
 
 const url = 'mongodb://localhost:27017';
 const dbName = 'chat';
-
-const doDatabase = (func,...params) => {
-    MongoClient.connect(url, function (err, client) {
-        assert.equal(null, err);
-        console.log('database connected');
-        const db = client.db(dbName);
-        func(db,...params);
-        client.close();
-    });
+const dbOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 };
 
-
+const doDatabase = (func, ...params) => {
+    MongoClient.connect(
+        url,
+        dbOptions,
+        function (err, client) {
+            assert.equal(null, err);
+            console.log('database connected');
+            const db = client.db(dbName);
+            func(db, ...params, () => {
+                client.close();
+                console.log('database closed');
+            });
+        }
+    );
+};
 
 let messageStorage = [];
 let usersCount = 0;
@@ -48,20 +56,40 @@ io.on('connection', (socket) => {
 
     socket.on('chat message', (msg) => {
         console.log("" + socket.user.id + " : " + msg);
-        if (msg == "logIN") {
-            doDatabase(
-                help.logIn,
-                (res)=>{
-                    console.log("res: " + res);
+        messageStorage.push([socket.user, msg]);
+        io.emit('chat message', socket.user, msg);
+    });
+
+    socket.on('logIn', (login, password) => {
+        console.log(socket.id);
+        doDatabase(
+            help.logIn,
+            (res) => {
+                if (res == undefined) {
+                    console.log('SERVER ' + socket.user.id + ': ' + 'failed login');
+                } else {
+                    console.log('SERVER ' + socket.user.id + ': ' + 'login succeed');
                     socket.user.username = res.info.username;
                     socket.user.color = res.info.color;
-                },
-                'vbkoshak',
-                'vb12345'
-            );
-        }
-        messageStorage.push([socket.user, msg]);
+                }
+            },
+            login,
+            password
+        );
+    });
 
-        io.emit('chat message', socket.user, msg);
+    socket.on('register', (login, password) => {
+        doDatabase(
+            help.register,
+            (obj) => {
+                if (obj.status == 'error') {
+                    console.log('SERVER ' + socket.user.id + ': ' + 'failed register');
+                } else if (obj.status == 'success') {
+                    console.log('SERVER ' + socket.user.id + ': ' + 'register succeeded');
+                }
+            },
+            login,
+            password
+        );
     });
 });

@@ -5,11 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <ul id="messages"></ul>
-    <input type="text" id="message">
-    <button type="submit" id="button">send</button>
+    <div class="mainbox flex-row">
+        <div class="text-box flex-column">
+            <ul id="messages"></ul>
+            <input type="text" id="message">
+            <button type="submit" id="button">send</button>
+        </div>
+        <div class="log-in-box flex-column">
+            <input type="text" name="login" id="login" placeholder="username">
+            <input type="password" name="password" id="password" placeholder="password">
+            <div class="buttons" class="buttonRow">
+                <button type="submit" id="logInButton">logIN</button>
+                <button type="submit" id="registerButton">register</button>
+            </div>
+        </div>
+        
+    </div>
+    
 <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 <script src="./secondary.js"></script>
 <script src="./chat.js"></script>
