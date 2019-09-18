@@ -1,21 +1,18 @@
 /*jshint esversion: 8 */
 const help = require('./secondary.js');
+const express = require('express');
+const app = express();
+const DB = require("./db.js");
 
-let express = require('express');
-let app = express();
-let server = require('http').createServer(app);
-let io = require('socket.io').listen(server);
-server.listen(3000);
-
-const MongoClient = require('mongodb').MongoClient;
+const server = require('http').createServer(app);
+const io = require('socket.io').listen(server);
 const assert = require('assert');
 
-const url = 'mongodb://localhost:27017';
-const dbName = 'chat';
-const dbOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-};
+server.listen(3000);
+console.log("Listening on port 3000");
+
+DB.initPool();
+console.log("db connected");
 
 const doDatabase = (func, ...params) => {
     MongoClient.connect(
@@ -62,34 +59,42 @@ io.on('connection', (socket) => {
 
     socket.on('logIn', (login, password) => {
         console.log(socket.id);
-        doDatabase(
-            help.logIn,
-            (res) => {
-                if (res == undefined) {
+        DB.getInstance((db) => {
+            const userCollection = db.collection('users');
+            userCollection.find({
+                login,
+                password
+            }).toArray(function (err, docs) {
+                assert.equal(err, null);
+                if (docs == undefined) {
                     console.log('SERVER ' + socket.user.id + ': ' + 'failed login');
                 } else {
                     console.log('SERVER ' + socket.user.id + ': ' + 'login succeed');
-                    socket.user.username = res.info.username;
-                    socket.user.color = res.info.color;
+                    socket.user.username = docs[0].info.username;
+                    socket.user.color = docs[0].info.color;
                 }
-            },
-            login,
-            password
-        );
+            });
+        });
     });
 
     socket.on('register', (login, password) => {
-        doDatabase(
-            help.register,
-            (obj) => {
-                if (obj.status == 'error') {
+        DB.getInstance((db) => {
+            const userCollection = db.collection('users');
+            userCollection.find({
+                login,
+                password
+            }).toArray(function (err, docs) {
+                assert.equal(err, null);
+                if (docs.length > 0) {
                     console.log('SERVER ' + socket.user.id + ': ' + 'failed register');
-                } else if (obj.status == 'success') {
-                    console.log('SERVER ' + socket.user.id + ': ' + 'register succeeded');
+                } else {
+                    userCollection.insertOne(
+                        help.createUser(login, password)
+                    ).then(() => {
+                        console.log('SERVER ' + socket.user.id + ': ' + 'register succeeded');
+                    });
                 }
-            },
-            login,
-            password
-        );
+            });
+        });
     });
 });
