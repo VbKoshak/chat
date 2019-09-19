@@ -1,0 +1,45 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row{
+    display: flex;
+    flex-direction: row;
+}
+
+
+.text-box {
+    flex: 3;
+}
+
+.log-in-box {
+    flex: 2;
+}
+
+.text-box>ul {
+    list-style-type: none;
+}
+
+.text-box>ul>li{
+    margin: 5px;
+    border: 1px solid black;
+    border-radius: 3px;
+    width: 70%;
+    word-wrap: break-word;
+    padding: 4px;
+}
+
+.text-box>ul>li.self {
+    margin-left: 30%;
+}

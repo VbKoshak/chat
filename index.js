@@ -14,22 +14,6 @@ console.log("Listening on port 3000");
 DB.initPool();
 console.log("db connected");
 
-const doDatabase = (func, ...params) => {
-    MongoClient.connect(
-        url,
-        dbOptions,
-        function (err, client) {
-            assert.equal(null, err);
-            console.log('database connected');
-            const db = client.db(dbName);
-            func(db, ...params, () => {
-                client.close();
-                console.log('database closed');
-            });
-        }
-    );
-};
-
 let messageStorage = [];
 let usersCount = 0;
 
