@@ -38,7 +38,8 @@ io.on('connection', (socket) => {
     socket.on('chat message', (msg) => {
         console.log("" + socket.user.id + " : " + msg);
         messageStorage.push([socket.user, msg]);
-        io.emit('chat message', socket.user, msg);
+        socket.broadcast.emit('chat message', socket.user, msg);
+        io.to(''+socket.id).emit('self-message', socket.user,msg);
     });
 
     socket.on('logIn', (login, password) => {

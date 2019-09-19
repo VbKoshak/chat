@@ -6,6 +6,11 @@ const ml = document.querySelector('#messages');
 socket.on('chat message', (user, msg) => {
     ml.appendChild(createMsg(user, msg));
 });
+socket.on('self-message',(user,msg) => {
+    let li = createMsg(user,msg,true);
+    li.classList.add('self');
+    ml.appendChild(li);
+})
 
 socket.on('chat history', (msgs) => {
     for(let i in msgs){
