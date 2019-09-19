@@ -8,11 +8,13 @@ const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
 const assert = require('assert');
 
-server.listen(3000);
-console.log("Listening on port 3000");
+server.listen(3000,()=>{
+    console.log("Listening on port 3000");
+});
 
-DB.initPool();
-console.log("db connected");
+DB.initPool(() => {
+    console.log("db connected");
+});
 
 let messageStorage = [];
 let usersCount = 0;
@@ -33,6 +35,10 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', function () {
         console.log('user#' + socket.user.id + ' disconnected');
+    });
+
+    socket.on('reconnect',() => {
+        console.log('user#' + socket.user.id + ' reconnected');
     });
 
     socket.on('chat message', (msg) => {

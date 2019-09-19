@@ -1,5 +1,7 @@
 /*jshint esversion: 6 */
-let socket = io();
+let socket = io({
+    autoConnect: true
+});
 
 const ml = document.querySelector('#messages');
 
