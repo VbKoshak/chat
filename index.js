@@ -1,8 +1,8 @@
 /*jshint esversion: 8 */
-const help = require('./secondary.js');
 const express = require('express');
 const app = express();
-const DB = require("./db.js");
+const help = require('./server/secondary.js');
+const DB = require("./server/db.js");
 
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
@@ -20,9 +20,9 @@ let messageStorage = [];
 let usersCount = 0;
 
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '/pages/index.html');
 });
-app.use(express.static('public'));
+app.use(express.static('./public'));
 
 io.on('connection', (socket) => {
     socket.user = {};
@@ -49,7 +49,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('logIn', (login, password) => {
-        console.log(socket.id);
         DB.getInstance((db) => {
             const userCollection = db.collection('users');
             userCollection.find({

@@ -6,3 +6,5 @@ const createMsg = (user, msg, self) => {
     li.style.backgroundColor = user.color;
     return li;
 };
+
+export default createMsg;

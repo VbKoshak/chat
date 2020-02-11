@@ -1,4 +1,8 @@
 /*jshint esversion: 6 */
+
+import createMsg from './secondary';
+
+
 let socket = io({
     autoConnect: true
 });
@@ -19,3 +23,5 @@ socket.on('chat history', (msgs) => {
         ml.appendChild(createMsg(msgs[i][0],msgs[i][1]));
     }
 });
+
+export default socket;

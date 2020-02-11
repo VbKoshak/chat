@@ -1,4 +1,6 @@
 /*jshint esversion: 6 */
+import socket from './chat';
+
 
 document.querySelector('#button').onclick = () => {
     socket.emit('chat message', document.querySelector('#message').value);
