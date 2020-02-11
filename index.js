@@ -56,7 +56,7 @@ io.on('connection', (socket) => {
                 password
             }).toArray(function (err, docs) {
                 assert.equal(err, null);
-                if (docs == undefined) {
+                if (docs[0] === undefined) {
                     console.log('SERVER ' + socket.user.id + ': ' + 'failed login');
                 } else {
                     console.log('SERVER ' + socket.user.id + ': ' + 'login succeed');

@@ -1,13 +1,12 @@
 const path = require('path');
 
 module.exports = {
-    mode: 'development',
-    devtool: 'inline-source-map',
     entry: {
-        client: '/client/events.js',
+	'client' : './client/events.js',
     },
     output: {
-        filename: '[name].js',
+        filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'public'),
     },
+    mode: 'development',
 }
