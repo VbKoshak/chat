@@ -1,19 +1,20 @@
 /*jshint esversion: 8 */
 const express = require('express');
 const app = express();
-const help = require('./server/secondary.js');
+const HELP = require('./server/secondary.js');
 const DB = require("./server/db.js");
+const MESSAGES = require("./server/messages.js");
 
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
 const assert = require('assert');
 
 server.listen(3000,()=>{
-    console.log("Listening on port 3000");
+    HELP.terminalLog("Listening on port 3000");
 });
 
 DB.initPool(() => {
-    console.log("db connected");
+    HELP.terminalLog("db connected");
 });
 
 let messageStorage = [];
@@ -28,21 +29,21 @@ io.on('connection', (socket) => {
     socket.user = {};
     socket.user.id = ++usersCount;
     socket.user.username = 'guest';
-    socket.user.color = help.generateColor();
+    socket.user.color = HELP.generateColor();
 
-    console.log('user#' + socket.user.id + ' connected');
+    HELP.terminalLog('user#' + socket.user.id + ' connected');
     socket.emit('chat history', messageStorage);
 
     socket.on('disconnect', function () {
-        console.log('user#' + socket.user.id + ' disconnected');
+        HELP.terminalLog('user#' + socket.user.id + ' disconnected');
     });
 
     socket.on('reconnect',() => {
-        console.log('user#' + socket.user.id + ' reconnected');
+        HELP.terminalLog('user#' + socket.user.id + ' reconnected');
     });
 
     socket.on('chat message', (msg) => {
-        console.log("" + socket.user.id + " : " + msg);
+        HELP.terminalLog("" + socket.user.id + " : " + msg);
         messageStorage.push([socket.user, msg]);
         socket.broadcast.emit('chat message', socket.user, msg);
         io.to(''+socket.id).emit('self-message', socket.user,msg);
@@ -57,11 +58,14 @@ io.on('connection', (socket) => {
             }).toArray(function (err, docs) {
                 assert.equal(err, null);
                 if (docs[0] === undefined) {
-                    console.log('SERVER ' + socket.user.id + ': ' + 'failed login');
+                    console.log(MESSAGES);
+                    HELP.terminalLog(`SERVER ${socket.user.id}: ${MESSAGES.logInFail}`);
+                    io.to('' + socket.id).emit('notification', HELP.systemUser, MESSAGES.logInFail);
                 } else {
-                    console.log('SERVER ' + socket.user.id + ': ' + 'login succeed');
+                    HELP.terminalLog(`SERVER ${socket.user.id}: ${MESSAGES.logInSuccess}`);
                     socket.user.username = docs[0].info.username;
                     socket.user.color = docs[0].info.color;
+                    io.to('' + socket.id).emit('notification', HELP.systemUser, MESSAGES.logInSuccess);
                 }
             });
         });
@@ -76,12 +80,12 @@ io.on('connection', (socket) => {
             }).toArray(function (err, docs) {
                 assert.equal(err, null);
                 if (docs.length > 0) {
-                    console.log('SERVER ' + socket.user.id + ': ' + 'failed register');
+                    HELP.terminalLog(`SERVER ${socket.user.id}: ${MESSAGES.registerFail}`);
                 } else {
                     userCollection.insertOne(
-                        help.createUser(login, password)
+                        HELP.createUser(login, password)
                     ).then(() => {
-                        console.log('SERVER ' + socket.user.id + ': ' + 'register succeeded');
+                        HELP.terminalLog(`SERVER ${socket.user.id}: ${MESSAGES.registerSuccess}`);
                     });
                 }
             });

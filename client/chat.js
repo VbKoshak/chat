@@ -12,6 +12,7 @@ const ml = document.querySelector('#messages');
 socket.on('chat message', (user, msg) => {
     ml.appendChild(createMsg(user, msg));
 });
+
 socket.on('self-message',(user,msg) => {
     let li = createMsg(user,msg,true);
     li.classList.add('self');
@@ -23,5 +24,9 @@ socket.on('chat history', (msgs) => {
         ml.appendChild(createMsg(msgs[i][0],msgs[i][1]));
     }
 });
+
+socket.on('notification', (user, msg) => {
+    ml.appendChild(createMsg(user,msg));
+})
 
 export default socket;

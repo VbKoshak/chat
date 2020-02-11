@@ -15,5 +15,16 @@ const createUser = (login, password) => {
     };
 };
 
+const systemUser = {
+    color: 'red',
+    username: 'SYSTEM',
+}
+
+const terminalLog = (msg) => {
+    console.log(msg);
+}
+
 module.exports.createUser = createUser;
 module.exports.generateColor = generateColor;
+module.exports.systemUser = systemUser;
+module.exports.terminalLog = terminalLog;
